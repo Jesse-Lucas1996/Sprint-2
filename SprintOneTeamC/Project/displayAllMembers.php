@@ -49,8 +49,8 @@ th {
 </style>
 
 <head>
-    <title>Display Movies</title>
-    <h1>Display Movies</h1>
+    <title>Search Page</title>
+    <h1>Display Members</h1>
     <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width = 100%">
    <link rel="stylesheet" href="stylesheet.css">
@@ -75,7 +75,7 @@ th {
 
 echo "<table style='border: solid 2px black;'>";
 echo '<table class="table-striped table-bordered table-responsive table">';
-echo "<tr><th>ID</th><th>Title</th><th>Studio</th><th>Status</th><th>Sound</th><th>Versions</th><th>RecRetPrice</th><th>Rating</th><th>Year</th><th>Genre</th><th>Aspect</th><th>Frequency</th></tr>";
+echo "<tr><th>Name</th><th>Email</th><th>Monthly Newsletter</th><th>Breaking Newsletter</th><th>";
 class TableRows extends RecursiveIteratorIterator {
  
 
@@ -83,7 +83,7 @@ class TableRows extends RecursiveIteratorIterator {
         parent::__construct($it, self::LEAVES_ONLY);
     }
     function current() {
-        return "<td style='width:150px;border:1px solid black;'> " . parent::current(). "</td> ";
+        return "<td style='width:100%;border:1px solid black;'> " . parent::current(). "</td> ";
     }
     function beginChildren() {
         echo "<tr> ";
@@ -102,7 +102,7 @@ try
 {
 $conn = new PDO('mysql:host=localhost;dbname=moviesdb', $username, $password); 
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$stmt = $conn->prepare('SELECT * FROM `movies` WHERE 1');
+$stmt = $conn->prepare('SELECT * FROM `members` WHERE 1');
 $stmt->execute();
     $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
     foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchall())) as $k=>$v) {

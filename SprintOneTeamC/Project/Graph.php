@@ -1,57 +1,78 @@
 <?php
 $localhost = "localhost";
+$dbname = "moviesdb";
 $username = "root";
 $password = "";
-$dbname = "movie";
+
 $sql = "SELECT Frequency, Title FROM movies ORDER BY Frequency DESC LIMIT 10";
-$conn = new PDO("mysql:host=$localhost;dbname=$dbname", $username, $password);
+$conn = new PDO("mysql:host=$localhost; dbname=$dbname", $username, $password);
+
 try {
-  $conn = new PDO("mysql:host=$localhost;dbname=$dbname", $username, $password);
+  $conn = new PDO("mysql:host=$localhost; dbname=$dbname", $username, $password);
   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $stmt = $conn->prepare($sql);
   $stmt->execute();
-} catch (PDOException $e) {
+} 
+catch(PDOException $e)
+{
   echo "Error: " . $e->getMessage();
-}
-
+} 
 
 $result = $conn->query($sql);
 $data = array();
 
-while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+while($row = $stmt->fetch(PDO::FETCH_ASSOC)) 
+{
   $data[$row['Title']] = $row['Frequency'];
 }
 
+// Image dimensions
+$imageWidth = 1280;
+$imageHeight = 1024;
 
-  
-$imageWidth = 1680;
-$imageHeight = 1050;
-
+// Grid dimensions and placement within image
 $gridTop = 40;
-$gridBottom = 1000;
-$gridHeight = $gridBottom - $gridTop;
-
 $gridLeft = 50;
+$gridBottom = 1000;
 $gridRight = 1100;
+$gridHeight = $gridBottom - $gridTop;
 $gridWidth = $gridRight - $gridLeft;
 
+// Bar and line width
 $lineWidth = 5;
 $barWidth = 50;
-$font = 'C:\xampp\htdocs\Project\OpenSans-Regular.ttf';
+
+// Font settings
+$font = 'C:\xampp\htdocs\Project_CalumSmith\OpenSans-Regular.ttf';
 $fontSize = 10;
 
+// Margin between label and axis
 $labelMargin = 8;
-$yMaxValue = 40;
+
+// Max value on y-axis
+$yMaxValue = 50;
+
+// Distance between grid lines on y-axis
 $yLabelSpan = 5;
+
+// Init image
 $chart = imagecreate($imageWidth, $imageHeight);
+
+// Setup colors
 $backgroundColor = imagecolorallocate($chart, 255, 255, 255);
 $axisColor = imagecolorallocate($chart, 85, 85, 85);
 $labelColor = $axisColor;
 $gridColor = imagecolorallocate($chart, 212, 212, 212);
-$barColor = imagecolorallocate($chart, 47, 133, 217);
+$barColor = imagecolorallocate($chart, 255, 99, 71);
+
 imagefill($chart, 0, 0, $backgroundColor);
 
 imagesetthickness($chart, $lineWidth);
+
+/*
+ * Print grid lines bottom up
+ */
+
 for($i = 0; $i <= $yMaxValue; $i += $yLabelSpan) {
     $y = $gridBottom - $i * $gridHeight / $yMaxValue;
 
@@ -67,13 +88,23 @@ for($i = 0; $i <= $yMaxValue; $i += $yLabelSpan) {
 
     imagettftext($chart, $fontSize, 0, $labelX, $labelY, $labelColor, $font, strval($i));
 }
+
+/*
+ * Draw x- and y-axis
+ */
+
 imageline($chart, $gridLeft, $gridTop, $gridLeft, $gridBottom, $axisColor);
 imageline($chart, $gridLeft, $gridBottom, $gridRight, $gridBottom, $axisColor);
+
+/*
+ * Draw the bars with labels
+ */
+
 $barSpacing = $gridWidth / count($data);
 $itemX = $gridLeft + $barSpacing / 2;
 
 foreach($data as $key => $value) {
-   
+    // Draw the bar
     $x1 = $itemX - $barWidth / 2;
     $y1 = $gridBottom - $value / $yMaxValue * $gridHeight;
     $x2 = $itemX + $barWidth / 2;
@@ -81,7 +112,7 @@ foreach($data as $key => $value) {
 
     imagefilledrectangle($chart, $x1, $y1, $x2, $y2, $barColor);
 
-  
+    // Draw the label
     $labelBox = imagettfbbox($fontSize, 0, $font, $key);
     $labelWidth = $labelBox[4] - $labelBox[0];
 
@@ -93,24 +124,10 @@ foreach($data as $key => $value) {
     $itemX += $barSpacing;
 }
 
+/*
+ * Output image to browser
+ */
 
 header('Content-Type: image/png');
-
 imagepng($chart);
-
-
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
